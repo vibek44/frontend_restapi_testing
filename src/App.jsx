@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import LoginForm from './components/LoginForm'
 import Blogs from './components/Blogs'
+import Notification from './components/Notification'
+import loginService from '../src/services/login'
 import blogService from './services/blogs'
 
 const App = () => {
@@ -8,27 +10,71 @@ const App = () => {
   const [user, setUser]=useState(null)
   const [userName, setUserName]=useState('')
   const [password, setPassword]=useState('')
+  const [message, setMessage]=useState({success:null, error:null})
 
-  useEffect(() => {
-    console.log('2')
-    blogService.getAll().then(blogs =>
-      setBlogs( blogs )
-    )  
-  }, [user])
+  useEffect( () => {
+    async function fetchBlog(){
+      try {
+        const blogs=await blogService.getAll()
+        setBlogs( blogs ) 
+      } catch (error) {
+        setMessage({...message, error:error.response.data.error})
+        setTimeout(() => {
+         setMessage({...message,error:null})
+        }, 2000);
+      } 
+    }
+    fetchBlog()
+  }, [ ])
 
-  const handleLogin=(e)=>{
+  useEffect(()=>{
+   const userJson=localStorage.getItem('userJson')
+   if(userJson){
+     const user=JSON.parse(userJson)
+     setUser(user)
+   }
+
+  },[])
+
+  const handleLogin=async (e)=>{
     e.preventDefault()
-    
+
+    try {
+      if(!userName || !password){
+        setMessage({...message,error:'username or password missing'})
+        setTimeout(()=>{
+          setMessage({...message,error:null})
+        },2000)
+        return
+      }
+      const user=await loginService.login({userName,password})
+      localStorage.setItem('userJson',JSON.stringify(user))
+      //console.log(user);
+      setUser(user)
+      setUserName('')
+      setPassword('')
+    } catch (error) {
+       setMessage({...message, error:error.response.data.error})
+       setTimeout(() => {
+         setMessage({...message,error:null})
+       }, 2000);
+    } 
   }
-  console.log('1');
+
+  const handleLogout = () => {
+    setUser(null)
+    localStorage.removeItem('userJson')
+  }
+ 
   return (
     <div>
+       <Notification message={message} />
       {<LoginForm 
-        handleLogin={handleLogin} user={user} 
         userName={userName} setUserName={setUserName}
         password={password} setPassword={setPassword}
+        handleLogin={handleLogin} handleLogout={handleLogout}
+        user={user} blogs={blogs}
       />}
-      { <Blogs blogs={blogs} /> }
     </div>
   )
 }
