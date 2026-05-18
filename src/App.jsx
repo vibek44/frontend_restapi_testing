@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect,useRef } from 'react'
 import LoginForm from './components/LoginForm'
 import Blogs from './components/Blogs'
 import Notification from './components/Notification'
@@ -9,79 +9,106 @@ import blogService from './services/blogs'
 const App = () => {
   const [blogs, setBlogs] = useState([])
   const [user, setUser]=useState(null)
-  const [message, setMessage]=useState({success:null, error:null})
-
+  const [message, setMessage]=useState({ success:null, error:null })
+  const blogFormRef=useRef()
+  const sortedBlogs=blogs.toSorted((a,b) => b.likes-a.likes)
   useEffect( () => {
     async function fetchBlog(){
       try {
         const blogs=await blogService.getAll()
-        setBlogs( blogs ) 
+        setBlogs( blogs )
       } catch (error) {
-        setMessage({...message, error:error.response.data.error})
+        setMessage({ ...message, error:error?.response.data.error })
         setTimeout(() => {
-         setMessage({...message,error:null})
-        }, 2000);
-      } 
+          setMessage({ ...message,error:null })
+        }, 2000)
+      }
     }
     fetchBlog()
   }, [ ])
 
-  useEffect(()=>{
-   const userJson=localStorage.getItem('userJson')
-   if(userJson){
-     const user=JSON.parse(userJson)
-     setUser(user)
-     blogService.setToken(user.token)
-   }
+  useEffect(() => {
+    const userJson=localStorage.getItem('userJson')
+    if(userJson){
+      const user=JSON.parse(userJson)
+      setUser(user)
+      blogService.setToken(user.token)
+    }
 
   },[])
 
-  const handleLogin=async ({userName,password})=>{
+  const handleLogin=async ({ userName,password }) => {
     if(!userName || !password){
-      setMessage({...message,error:'username or password missing'})
-      setTimeout(()=>{
-        setMessage({...message,error:null})
+      setMessage({ ...message,error:'username or password missing' })
+      setTimeout(() => {
+        setMessage({ ...message,error:null })
       },2000)
       return
     }
     try {
-      const user=await loginService.login({userName,password})
+      const user=await loginService.login({ userName,password })
       blogService.setToken(user.token)
       localStorage.setItem('userJson',JSON.stringify(user))
       //console.log(user);
       setUser(user)
     } catch (error) {
-       //console.log(error);
-       setMessage({...message, error:error.response.data.error})
-       setTimeout(() => {
-         setMessage({...message,error:null})
-        }, 2000);
-      } 
+      //console.log(error);
+      setMessage({ ...message, error:error?.response?.data?.error })
+      setTimeout(() => {
+        setMessage({ ...message,error:null })
+      }, 2000)
+    }
   }
 
-  const handleBlogForm = async ({title,author,url}) => {
+  const handleBlogForm = async ({ title,author,url }) => {
     if(!title ||!author ||!url){
-      setMessage({...message,error:'title,author or url missing!'})
+      setMessage({ ...message,error:'title,author or url missing!' })
       setTimeout(() => {
-        setMessage({...message,error:null})
+        setMessage({ ...message,error:null })
       }, 3000)
       return
     }
     try {
-     
-      const savedBlog=await blogService.create({title,author,url})
-      
+      blogFormRef.current.toggleVisibility()
+      const savedBlog=await blogService.create({ title,author,url })
       setBlogs(blogs.concat(savedBlog))
-      setMessage({...message,success:`a new blog ${savedBlog.title}! by ${savedBlog.author} added`})
+      setMessage({ ...message,success:`a new blog ${savedBlog.title}! by ${savedBlog.author} added` })
       setTimeout(() => {
-        setMessage({...message,success:null})
-      },2000);
+        setMessage({ ...message,success:null })
+      },2000)
     } catch (error) {
-      //console.log(error);
-      setMessage({...message,error:error.response.data.error})
+      setMessage({ ...message,error:error?.response?.data?.error })
       setTimeout(() => {
-        setMessage({...message,error:null})
-      }, 3000);
+        setMessage({ ...message,error:null })
+      }, 3000)
+    }
+  }
+
+  const handleBlogUpdate = async(changedBlog) => {
+    try {
+      const updatedBlog=await blogService.update(changedBlog)
+      setBlogs(blogs.map(blog => blog.id!==updatedBlog.id ? blog : updatedBlog))
+
+    } catch (error) {
+      setMessage({ ...message,error:error?.response?.data?.error })
+      setTimeout(() => {
+        setMessage({ ...message,error:null })
+      }, 3000)
+    }
+
+  }
+  const handleRemove = async(removeBlog) => {
+    const result=confirm(`Remove ${removeBlog.title} by ${removeBlog.author}`)
+    if(!result) return
+    try {
+      console.log(typeof removeBlog.id)
+      await blogService.remove(removeBlog.id)
+      setBlogs(blogs.filter(blog => blog.id!==removeBlog.id))
+    } catch (error) {
+      setMessage({ ...message,error:error?.response?.data?.error })
+      setTimeout(() => {
+        setMessage({ ...message,error:null })
+      }, 3000)
     }
   }
 
@@ -91,10 +118,14 @@ const App = () => {
   }
 
   return (
-    <div> 
-       <Notification message={message} />
+    <div>
+      <Notification message={message} />
       { !user && <LoginForm  handleLogin={handleLogin} /> }
-      { user && <Blogs user={user} blogs={blogs} handleLogout={handleLogout} handleBlogForm={handleBlogForm}/>}
+      { user && <Blogs ref={blogFormRef} user={user}
+        sortedBlogs={sortedBlogs} handleLogout={handleLogout}
+        handleBlogForm={handleBlogForm} handleBlogUpdate={handleBlogUpdate}
+        handleRemove={handleRemove}
+      />}
     </div>
   )
 }
