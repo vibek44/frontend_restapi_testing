@@ -19,14 +19,14 @@ const Blog = ({ blog ,handleBlogUpdate,handleRemove }) => {
 
   return(
     <div style={blogStyle}>
-      <div style={hideWhenView}>
-        {blog.title} <b>By</b> {blog.author} <button onClick={() => setShow(!view)}>view</button>
+      <div className='briefly' style={hideWhenView}>
+        {blog.title}<b>By</b> {blog.author} <button onClick={() => setShow(!view)}>view</button>
       </div>
-      <div style={showWhenView}>
+      <div className='detail' style={showWhenView}>
         <p>{blog.title} by {blog.author} <button onClick={() => setShow(!view)}>hide</button></p>
-        <a href={`${blog.url}`} target="_blank">{blog.url}</a>
+        <a href={blog.url} target="_blank">{blog.url}</a>
         <p>likes:{blog.likes} <button onClick={() => handleLikes(blog)}>like</button> </p>
-        <p>{blog.user.userName}</p>
+        <p> {blog.user.userName} </p>
         <button onClick={() => handleRemove(blog)}>remove</button>
       </div>
 
