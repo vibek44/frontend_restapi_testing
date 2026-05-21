@@ -11,13 +11,13 @@ const BlogForm = ({ handleBlogForm }) => {
   return(
     <form  onSubmit={handleFormInput}style={{ width:400 }}>
       <label>
-            title: <input type="text" value={title} onChange={({ target }) => setTitle(target.value)}/>
+            title <input type="text" value={title} onChange={({ target }) => setTitle(target.value)}/>
       </label> <br />
       <label>
-            author: <input type="text" value={author} onChange={({ target }) => setAuthor(target.value)}/>
+            author <input type="text" value={author} onChange={({ target }) => setAuthor(target.value)}/>
       </label> <br />
       <label>
-            url: <input type="text" value={url} onChange={({ target }) => setUrl(target.value)} />
+            url <input type="url" value={url} onChange={({ target }) => setUrl(target.value)} />
       </label>  <br />
       <button type="submit">submit</button>
     </form>
