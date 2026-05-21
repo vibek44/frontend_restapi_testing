@@ -11,5 +11,10 @@ export default defineConfig({
         changeOrigin: true
       }
     }
+  },
+  test:{
+    environment: 'jsdom',
+    globals: true,            //with globals true keywords describe,test,expect  dont need to import from vite
+    setupFiles: './testSetup.js'
   }
 })
