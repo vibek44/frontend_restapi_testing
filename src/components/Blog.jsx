@@ -13,7 +13,7 @@ const Blog = ({ user, blog ,handleBlogUpdate,handleRemove }) => {
       <Link to={blog.url} target="_blank">{blog.url}</Link>
       <p>likes:{blog.likes} {user && <button onClick={() => handleLikes(blog)}>like</button>} </p>
       <p> Created by {blog.user.userName} </p>
-      {user && <button onClick={() => handleRemove(blog)}>remove</button>}
+      {( user && (user.id===blog.user.id))  && <button onClick={() => handleRemove(blog)}>remove</button>}
     </div>
   )
 
