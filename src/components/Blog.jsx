@@ -1,36 +1,21 @@
-import { useState } from 'react'
+import { Link } from 'react-router-dom'
 
-const Blog = ({ blog ,handleBlogUpdate,handleRemove }) => {
-  const blogStyle = {
-    paddingTop: 10,
-    paddingLeft: 2,
-    border: 'solid',
-    borderWidth: 1,
-    marginBottom: 5
-  }
-  const [view,setShow]=useState(false)
-  const hideWhenView={ display:view ? 'none' : '' }
-  const showWhenView={ display:view ? '' : 'none' }
-
+const Blog = ({ user, blog ,handleBlogUpdate,handleRemove }) => {
   const handleLikes = (blog) => {
     const changedBlog={ ...blog,likes:blog.likes+1 }
     handleBlogUpdate(changedBlog)
   }
 
+  if (!blog)return null
   return(
-    <div style={blogStyle}>
-      <div className='briefly' style={hideWhenView}>
-        {blog.title}<b>By</b> {blog.author} <button onClick={() => setShow(!view)}>view</button>
-      </div>
-      <div className='detail' style={showWhenView}>
-        <p>{blog.title} by {blog.author} <button onClick={() => setShow(!view)}>hide</button></p>
-        <a href={blog.url} target="_blank">{blog.url}</a>
-        <p>likes:{blog.likes} <button onClick={() => handleLikes(blog)}>like</button> </p>
-        <p> {blog.user.userName} </p>
-        <button onClick={() => handleRemove(blog)}>remove</button>
-      </div>
-
+    <div className='detail' style={{ margin:'10px' }}>
+      <b>  {blog.author}:  {blog.title}</b><br/>
+      <Link to={blog.url} target="_blank">{blog.url}</Link>
+      <p>likes:{blog.likes} {user && <button onClick={() => handleLikes(blog)}>like</button>} </p>
+      <p> Created by {blog.user.userName} </p>
+      {user && <button onClick={() => handleRemove(blog)}>remove</button>}
     </div>
   )
+
 }
 export default Blog
