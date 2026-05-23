@@ -1,9 +1,16 @@
 import { useState, useEffect,useRef } from 'react'
-import LoginForm from './components/LoginForm'
-import Blogs from './components/Blogs'
+
+import MenuLink from './components/MenuLink'
 import Notification from './components/Notification'
+import Blogs from './components/Blogs'
+import Blog from './components/Blog'
+import Togglable from './components/Togglable'
+import LoginForm from './components/LoginForm'
 import loginService from '../src/services/login'
 import blogService from './services/blogs'
+import {  Route,Routes, useMatch, useNavigate } from 'react-router-dom'
+import BlogForm from './components/BlogForm'
+
 
 
 const App = () => {
@@ -12,7 +19,11 @@ const App = () => {
   const [message, setMessage]=useState({ success:null, error:null })
   const blogFormRef=useRef()
   const sortedBlogs=blogs.toSorted((a,b) => b.likes-a.likes)
+  const navigate=useNavigate()
+  const match=useMatch('/blogs/:id')  //match is object with property params
+  const blog=sortedBlogs.find(el => match? el.id===match.params.id:null)
   useEffect( () => {
+
     async function fetchBlog(){
       try {
         const blogs=await blogService.getAll()
@@ -25,14 +36,18 @@ const App = () => {
       }
     }
     fetchBlog()
-  }, [ ])
+  }, [])
 
   useEffect(() => {
     const userJson=localStorage.getItem('userJson')
     if(userJson){
       const user=JSON.parse(userJson)
-      setUser(user)
       blogService.setToken(user.token)
+      setUser(user)
+      if(match){
+        navigate(`/blogs/${match.params.id}`)
+      }
+      else navigate('/')
     }
 
   },[])
@@ -49,8 +64,8 @@ const App = () => {
       const user=await loginService.login({ userName,password })
       blogService.setToken(user.token)
       localStorage.setItem('userJson',JSON.stringify(user))
-      //console.log(user);
       setUser(user)
+      navigate('/')
     } catch (error) {
       //console.log(error);
       setMessage({ ...message, error:error?.response?.data?.error })
@@ -76,6 +91,7 @@ const App = () => {
       setTimeout(() => {
         setMessage({ ...message,success:null })
       },2000)
+      navigate('/')
     } catch (error) {
       setMessage({ ...message,error:error?.response?.data?.error })
       setTimeout(() => {
@@ -101,9 +117,9 @@ const App = () => {
     const result=confirm(`Remove ${removeBlog.title} by ${removeBlog.author}`)
     if(!result) return
     try {
-      console.log(typeof removeBlog.id)
       await blogService.remove(removeBlog.id)
       setBlogs(blogs.filter(blog => blog.id!==removeBlog.id))
+      navigate('/')
     } catch (error) {
       setMessage({ ...message,error:error?.response?.data?.error })
       setTimeout(() => {
@@ -114,19 +130,29 @@ const App = () => {
 
   const handleLogout = () => {
     setUser(null)
+    blogService.setToken('not-allowed')
     localStorage.removeItem('userJson')
+    navigate('/')
   }
 
   return (
     <div>
+      <MenuLink user={user} handleLogout={handleLogout}/>
       <Notification message={message} />
-      { !user && <LoginForm  handleLogin={handleLogin} /> }
-      { user && <Blogs ref={blogFormRef} user={user}
-        sortedBlogs={sortedBlogs} handleLogout={handleLogout}
-        handleBlogForm={handleBlogForm} handleBlogUpdate={handleBlogUpdate}
-        handleRemove={handleRemove}
-      />}
+      <Routes>
+        <Route path='/create'
+          element={
+            <Togglable ref={blogFormRef} buttonLabel='create' >
+              <BlogForm handleBlogForm={handleBlogForm}/>
+            </Togglable>}
+        />
+        <Route path='/blogs/:id' element={  <Blog  user={user} blog={blog} handleBlogUpdate={handleBlogUpdate} handleRemove={handleRemove}/>}/>
+        <Route path='/login' element={<LoginForm handleLogin={handleLogin}/>} />
+        <Route  path='/' element={ <Blogs sortedBlogs={sortedBlogs} /> } />
+      </Routes>
     </div>
+
+
   )
 }
 
