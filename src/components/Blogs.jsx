@@ -1,17 +1,13 @@
-import Blog from './Blog'
-import BlogForm from './BlogForm'
-import Togglable from './Togglable'
+import { Link } from 'react-router-dom'
 
-const Blogs = ( { user,sortedBlogs,handleBlogForm,handleLogout,ref,handleBlogUpdate,handleRemove } ) => {
+const Blogs = ( { sortedBlogs } ) => {
   return(
     <div>
       <h3>Blogs</h3>
-      <p>{user.userName} Logged In <button onClick={handleLogout}>LogOut</button></p>
-      <Togglable buttonLabel='Create new blog' ref={ref}>
-        <BlogForm  handleBlogForm={handleBlogForm}/>
-      </Togglable>
-      <h4>BlogList</h4>
-      {sortedBlogs.map(blog => <Blog key={blog.id} blog={blog} handleBlogUpdate={handleBlogUpdate} handleRemove={handleRemove}/>)}
+      <ul className='briefly'>
+        { sortedBlogs.map(blog => <li key={blog.id }> <Link to={`/blogs/${blog.id}`}>{blog.title} By {blog.author}</Link> </li> )
+        }
+      </ul>
     </div>
   )
 }
