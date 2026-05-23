@@ -2,7 +2,7 @@ import { NavLink } from 'react-router-dom'
 
 const MenuLink = ({ user,handleLogout }) => {
   const styleLink= ({ isActive }) => (
-    { color: isActive ? '#FF4433' : '',
+    { color: isActive ? '#4B0092' : '',
       marginRight:'0.5em',
       textDecoration:isActive?'underline':'none'
     })
