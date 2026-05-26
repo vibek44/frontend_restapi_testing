@@ -1,3 +1,4 @@
+import { TextField ,Button,Grid} from '@mui/material'
 import { useState } from 'react'
 
 const LoginForm=( { handleLogin }) => {
@@ -12,30 +13,36 @@ const LoginForm=( { handleLogin }) => {
   }
 
   return(
-    <form onSubmit={handleLoginFormInput}>
-      <div>
-        <label>
-          username
-          <input
-            type="text"
+    <div>
+       <h3>Log in to application</h3>
+      <form onSubmit={handleLoginFormInput} >
+        <Grid  >
+          <Grid >
+          <TextField
+            size='small'
+            variant='standard'
+            label="username"
+            type='text'
             value={userName}
             onChange={({ target }) => setUserName(target.value.trim())}
           />
-        </label>
-      </div>
-      <div>
-        <label>
-          password
-          <input
-            type="password"
+          </Grid>
+          <Grid>
+          <TextField 
+            size='small'
+            variant='standard'
+            label='password'
+            type='password'
             value={password}
             onChange={({ target }) => setPassword(target.value.trim())}
           />
-        </label>
-      </div>
-      <button type="submit">login</button>
-
-    </form>
+          </Grid>
+          <Grid>
+            <Button type="submit" variant='contained' sx={{mt:3}} >login</Button>
+          </Grid>         
+        </Grid>
+      </form>
+    </div>
   )
 }
 
