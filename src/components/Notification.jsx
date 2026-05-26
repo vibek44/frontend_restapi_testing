@@ -1,11 +1,13 @@
+import { Alert } from "@mui/material"
+
 const Notification = ({ message }) => {
   if(message.error){
-    return( <p className="error">{message.error}</p> )
+    return( <Alert severity="error" >{message.error}</Alert> )
   }
   if(message.success){
-    return( <p className="success">{message.success}</p> )
+    return( <Alert severity="success" >{message.success}</Alert> )
   }
-  return null
+  return <Alert severity="info" >{null}</Alert>
 }
 
 
