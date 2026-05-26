@@ -133,7 +133,7 @@ const App = () => {
   }
 
   return (
-    <Container sx={{margin:'0 auto'}}>
+    <Container disableGutters='false'>
       <MenuLink user={user} handleLogout={handleLogout}/>
       <Notification message={message} />
       <Routes> 
