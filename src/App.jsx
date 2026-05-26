@@ -10,8 +10,7 @@ import loginService from '../src/services/login'
 import blogService from './services/blogs'
 import {  Route,Routes, useMatch, useNavigate } from 'react-router-dom'
 import BlogForm from './components/BlogForm'
-
-
+import { Container } from '@mui/material'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
@@ -21,9 +20,9 @@ const App = () => {
   const sortedBlogs=blogs.toSorted((a,b) => b.likes-a.likes)
   const navigate=useNavigate()
   const match=useMatch('/blogs/:id')  //match is object with property params
-  const blog=sortedBlogs.find(el => match? el.id===match.params.id:null)
+  const blog=sortedBlogs.find(el=>match? el.id===match.params.id:null)
   useEffect( () => {
-
+    
     async function fetchBlog(){
       try {
         const blogs=await blogService.getAll()
@@ -49,7 +48,6 @@ const App = () => {
       }
       else navigate('/')
     }
-
   },[])
 
   const handleLogin=async ({ userName,password }) => {
@@ -67,7 +65,6 @@ const App = () => {
       setUser(user)
       navigate('/')
     } catch (error) {
-      //console.log(error);
       setMessage({ ...message, error:error?.response?.data?.error })
       setTimeout(() => {
         setMessage({ ...message,error:null })
@@ -104,7 +101,7 @@ const App = () => {
     try {
       const updatedBlog=await blogService.update(changedBlog)
       setBlogs(blogs.map(blog => blog.id!==updatedBlog.id ? blog : updatedBlog))
-
+      
     } catch (error) {
       setMessage({ ...message,error:error?.response?.data?.error })
       setTimeout(() => {
@@ -136,23 +133,21 @@ const App = () => {
   }
 
   return (
-    <div>
+    <Container sx={{margin:'0 auto'}}>
       <MenuLink user={user} handleLogout={handleLogout}/>
       <Notification message={message} />
-      <Routes>
-        <Route path='/create'
-          element={
-            <Togglable ref={blogFormRef} buttonLabel='create' >
-              <BlogForm handleBlogForm={handleBlogForm}/>
-            </Togglable>}
+      <Routes> 
+        <Route path='/create' 
+          element={ 
+          <Togglable ref={blogFormRef} buttonLabel='create' >
+            <BlogForm handleBlogForm={handleBlogForm}/>
+          </Togglable>}
         />
         <Route path='/blogs/:id' element={  <Blog  user={user} blog={blog} handleBlogUpdate={handleBlogUpdate} handleRemove={handleRemove}/>}/>
         <Route path='/login' element={<LoginForm handleLogin={handleLogin}/>} />
         <Route  path='/' element={ <Blogs sortedBlogs={sortedBlogs} /> } />
       </Routes>
-    </div>
-
-
+    </Container>
   )
 }
 
