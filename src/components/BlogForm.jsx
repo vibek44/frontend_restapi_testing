@@ -1,4 +1,6 @@
 import {  useState } from 'react'
+import { TextField, Button, Stack } from '@mui/material'
+
 
 const BlogForm = ({ handleBlogForm }) => {
   const [title,setTitle]=useState('')
@@ -9,18 +11,44 @@ const BlogForm = ({ handleBlogForm }) => {
     handleBlogForm({ title,author,url })
   }
   return(
-    <form  onSubmit={handleFormInput}style={{ width:400 }}>
-      <label>
-            title <input type="text" value={title} onChange={({ target }) => setTitle(target.value)}/>
-      </label> <br />
-      <label>
-            author <input type="text" value={author} onChange={({ target }) => setAuthor(target.value)}/>
-      </label> <br />
-      <label>
-            url <input type="url" value={url} onChange={({ target }) => setUrl(target.value)} />
-      </label>  <br />
-      <button type="submit">submit</button>
-    </form>
+    <>
+       <h3>Create a blog</h3>
+      <form  onSubmit={handleFormInput}style={{ width:'20em' }}>
+      <Stack   spacing={3} >
+          
+          <TextField
+            size='small'
+            variant='outlined'
+            label='title'
+            type='text'
+            value={title}
+            onChange={({ target }) => setTitle(target.value.trim())}
+          />
+        
+          <TextField 
+            size='small'
+            variant='outlined'
+            label='author'
+            type='text'
+            value={author}
+            onChange={({ target }) => setAuthor(target.value.trim())}
+          />
+         
+            <TextField 
+              size='small'
+              variant='outlined'
+              label='url'
+              type='text'
+              value={url}
+              onChange={({ target }) => setUrl(target.value.trim())}
+            />
+          
+            <Button type="submit" variant='contained' size='small' sx={{width:'7em'}} >create</Button>
+                   
+        </Stack>
+      </form >
+    </>
+    
   )
 }
 
