@@ -1,18 +1,33 @@
 import { NavLink } from 'react-router-dom'
+import { Stack} from '@mui/material'
+
 
 const MenuLink = ({ user,handleLogout }) => {
-  const styleLink= ({ isActive }) => (
-    { color: isActive ? '#4B0092' : '',
-      marginRight:'0.5em',
-      textDecoration:isActive?'underline':'none'
+  const styleLink= ({isActive})=>({ 
+      textDecoration: isActive? '' :'none',
+      color: isActive? 'lightgrey' :'white',
+      marginLeft:'1em'  
     })
 
+  const styleStack={
+    alignItems:'center',
+    backgroundColor:'#0080FE',
+    height:'4em',
+    margin: '1em auto',
+    justifyContent:'space-between'
+ }
+
   return(
-    <div style={{ marginBottom:'1em' }}>
-      <NavLink to='/' style={styleLink}>Blogs</NavLink>
-      {user && <NavLink to='/create'>new blog</NavLink>}
-      { user ? <button onClick={handleLogout}>logout</button>:<NavLink to='/login' style={styleLink}>Login</NavLink>}
-    </div>
+    <Stack   direction='row' style={styleStack}>
+        <Stack >
+        <NavLink style={{textDecoration:'none', marginLeft:'1em',color:'white',fontSize:'1.5em'} } to='/'>BlogApp</NavLink>
+        </Stack>
+        <Stack  direction='row' spacing={1} sx={{marginRight:'1em'}} >
+        <NavLink  style={styleLink} to='/' >BLOGS</NavLink>
+        {user && <NavLink style={styleLink} to='/create'  caseSensitive >NEW BLOG</NavLink>}
+        { user ? <button style={{height:'1.5em'}}  onClick={handleLogout}>LOGOUT</button>:<NavLink  style={styleLink} to='/login'   caseSensitive>LOGIN</NavLink>} 
+        </Stack>
+    </Stack>
   )
 }
 export default MenuLink
